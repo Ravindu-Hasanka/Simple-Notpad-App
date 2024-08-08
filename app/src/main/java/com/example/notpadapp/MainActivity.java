@@ -1,27 +1,26 @@
-    package com.example.notpadapp;
+package com.example.notpadapp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import java.util.ArrayList;
+import android.widget.TextView;
 import java.util.Date;
 import java.util.List;
 
-    public class MainActivity extends AppCompatActivity {
+import com.example.notepadapp.Note;
 
-    private static final String PREFS_NAME = "NotesPrefs";
-    private static final String KEY_NOTE_COUNT = "NoteCount";
+
+public class MainActivity extends AppCompatActivity {
 
     private LinearLayout notesContainer;
-    private List<Note> notes;
-
-
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +30,23 @@ import java.util.List;
         notesContainer = findViewById(R.id.notesLayout);
         Button addNoteButton = findViewById(R.id.addNoteButton);
 
-        notes = new ArrayList<>();
+        databaseHelper = new DatabaseHelper(this);
 
-        addNoteButton.setOnClickListener(v -> {
-            saveNote();
+        addNoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveNote();
+            }
         });
+
+        displayNotes();
+    }
+
+    private void displayNotes() {
+        List<com.example.notepadapp.Note> notes = databaseHelper.getAllNotes();
+        for (Note note : notes) {
+            createNotesView(note);
+        }
     }
 
     private void saveNote() {
@@ -45,7 +56,7 @@ import java.util.List;
         String title = titleEditText.getText().toString();
         String content = contentEditText.getText().toString();
 
-        if(title.isEmpty() || content.isEmpty()) {
+        if (title.isEmpty() || content.isEmpty()) {
             return;
         }
 
@@ -55,27 +66,64 @@ import java.util.List;
         Date date = new Date();
         note.setDate(date.toString());
 
-        notes.add(note);
-        saveNotesToPreferences();
-
-        createNotesView();
+        databaseHelper.addNote(note);
+        createNotesView(note);
+        clearInputFields();
     }
 
-        private void createNotesView() {
-            View noteView = getLayoutInflater().inflate(R.layout.note_item.xml);
-        }
+    private void clearInputFields() {
+        EditText titleEditText = findViewById(R.id.titleEditText);
+        EditText contentEditText = findViewById(R.id.descriptionEditText);
 
-        private void saveNotesToPreferences() {
-            SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
+        titleEditText.getText().clear();
+        contentEditText.getText().clear();
+    }
 
-            editor.putInt(KEY_NOTE_COUNT, notes.size());
-            for(int i = 0; i < notes.size(); i++) {
-                Note note = notes.get(i);
-                editor.putString("noteTitle" + i, note.getTitle());
-                editor.putString("noteContent" + i, note.getContent());
-                editor.putString("noteDate" + i, note.getDate());
+    private void createNotesView(final Note note) {
+        View noteView = getLayoutInflater().inflate(R.layout.note_item, null);
+        TextView titleTextView = noteView.findViewById(R.id.titleTextView);
+
+        titleTextView.setText(note.getTitle());
+
+        noteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NoteDetailsActivity.class);
+                intent.putExtra("title", note.getTitle());
+                intent.putExtra("date", note.getDate());
+                intent.putExtra("content", note.getContent());
+                startActivity(intent);
             }
-            editor.apply();
-        }
+        });
+
+        noteView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showDeleteDialog(note);
+                return true;
+            }
+        });
+
+        notesContainer.addView(noteView);
     }
+
+    private void showDeleteDialog(final Note note) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Note");
+        builder.setMessage("Are you sure you want to delete this note?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                databaseHelper.deleteNoteById(note.getId());
+                refreshNoteViews();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private void refreshNoteViews() {
+        notesContainer.removeAllViews();
+        displayNotes();
+    }
+}

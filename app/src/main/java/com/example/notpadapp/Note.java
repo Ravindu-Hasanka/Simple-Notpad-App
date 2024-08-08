@@ -1,11 +1,18 @@
-package com.example.notpadapp;
+package com.example.notepadapp;
 
 public class Note {
+    private int id;
     private String title;
     private String content;
     private String date;
 
-    public Note() {
+    // Getters and setters for all fields
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -29,12 +36,6 @@ public class Note {
     }
 
     public void setDate(String date) {
-        this.date = date;
-    }
-
-    Note (String title, String content, String date) {
-        this.title = title;
-        this.content = content;
         this.date = date;
     }
 }
