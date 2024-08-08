@@ -8,13 +8,26 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simple Notepad"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        />
+
     <EditText
         android:id="@+id/titleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Title"
         android:inputType="text"
+        android:padding="10dp"
+        android:background="@drawable/edit_text_background"
         />
+
     <EditText
         android:id="@+id/descriptionEditText"
         android:layout_width="match_parent"
@@ -22,14 +35,19 @@
         android:hint="Description"
         android:inputType="textMultiLine"
         android:minLines="1"
+        android:padding="10dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/edit_text_background"
         />
+
     <Button
         android:id="@+id/addNoteButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Note"
         android:layout_marginTop="16dp"
+        android:backgroundTint="@color/black"
+        android:textColor="@android:color/white"
         />
 
     <TextView
@@ -39,16 +57,16 @@
         android:textSize="24sp"
         android:layout_marginTop="16dp"
         />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        >
+        android:layout_marginTop="16dp">
         <LinearLayout
+            android:id="@+id/notesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/notesLayout"
             />
     </ScrollView>
 

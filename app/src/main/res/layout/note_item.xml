@@ -3,12 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/note_item_background"
+    android:layout_marginBottom="20dp"> <!-- Added marginBottom to create gap -->
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        />
+
 </LinearLayout>
